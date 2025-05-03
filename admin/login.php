@@ -34,7 +34,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($admin && $password === $admin['password']) { 
             $_SESSION['admin_id'] = $admin['id'];
             $_SESSION['admin_name'] = $admin['username'];
-            header('Location: dashboard.php');
+            $_SESSION['admin_role'] = $admin['role'];
+            
+            // Redirect based on role
+            if ($admin['role'] === 'super_admin') {
+                header('Location: super_admin_dashboard.php');
+            } else {
+                header('Location: dashboard.php');
+            }
             exit();
         } else {
             $error_message = "Invalid username or password";

@@ -2,8 +2,8 @@
 session_start();
 require_once '../config/database.php';
 
-// Check if admin is logged in
-if (!isset($_SESSION['admin_id'])) {
+// Check if super admin is logged in
+if (!isset($_SESSION['admin_id']) || $_SESSION['admin_role'] !== 'super_admin') {
     header('Location: login.php');
     exit();
 }
@@ -13,6 +13,8 @@ $stats = [
     'students' => $pdo->query("SELECT COUNT(*) FROM students")->fetchColumn(),
     'projects' => $pdo->query("SELECT COUNT(*) FROM projects")->fetchColumn(),
     'nominations' => $pdo->query("SELECT COUNT(*) FROM nominations")->fetchColumn(),
+    'admins' => $pdo->query("SELECT COUNT(*) FROM admins")->fetchColumn(),
+    'active_admins' => $pdo->query("SELECT COUNT(*) FROM admins WHERE is_active = 1")->fetchColumn(),
     'departments' => $pdo->query("SELECT COUNT(DISTINCT department) FROM students")->fetchColumn()
 ];
 
@@ -32,6 +34,9 @@ $recent_activities = $pdo->query("
     ORDER BY date DESC
     LIMIT 10
 ")->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch admin list
+$admins = $pdo->query("SELECT id, username, role, is_active FROM admins ORDER BY role DESC, username")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -39,7 +44,7 @@ $recent_activities = $pdo->query("
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - TopTrack</title>
+    <title>Super Admin Dashboard - TopTrack</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -56,7 +61,7 @@ $recent_activities = $pdo->query("
 
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
-            <a class="navbar-brand" href="dashboard.php">TopTrack Admin</a>
+            <a class="navbar-brand" href="super_admin_dashboard.php">TopTrack Super Admin</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -82,13 +87,11 @@ $recent_activities = $pdo->query("
                             <i class="bi bi-graph-up"></i> Analytics
                         </a>
                     </li>
-                    <?php if ($_SESSION['admin_role'] === 'super_admin'): ?>
-                        <li class="nav-item">
-                            <a class="nav-link" href="manage_admins.php">
-                                <i class="bi bi-gear"></i> Manage Admins
-                            </a>
-                        </li>
-                    <?php endif; ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="manage_admins.php">
+                            <i class="bi bi-gear"></i> Manage Admins
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="logout.php">
                             <i class="bi bi-box-arrow-right"></i> Logout
@@ -101,7 +104,7 @@ $recent_activities = $pdo->query("
 
     <div class="container mt-5">
         <div class="d-flex justify-content-between align-items-center mb-5">
-            <h2 class="section-title mb-0">Dashboard Overview</h2>
+            <h2 class="section-title mb-0">Super Admin Dashboard</h2>
             <div class="btn-group">
                 <a href="../public_gallery.php" class="btn btn-outline-primary">
                     <i class="bi bi-eye"></i> View Public Gallery
@@ -134,20 +137,67 @@ $recent_activities = $pdo->query("
             </div>
             <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
                 <div class="modern-card dashboard-card">
-                    <i class="bi bi-building"></i>
-                    <div class="stats-value"><?php echo $stats['departments']; ?></div>
-                    <div class="stats-label">Departments</div>
+                    <i class="bi bi-shield-check"></i>
+                    <div class="stats-value"><?php echo $stats['active_admins']; ?>/<?php echo $stats['admins']; ?></div>
+                    <div class="stats-label">Active Admins</div>
                 </div>
             </div>
         </div>
 
-        <!-- Quick Actions -->
+        <!-- Admin Management Section -->
         <div class="row mb-5">
             <div class="col-md-6" data-aos="fade-right">
                 <div class="modern-card">
                     <div class="card-body">
+                        <h5 class="card-title mb-4">Admin Management</h5>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($admins as $admin): ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($admin['username']); ?></td>
+                                            <td>
+                                                <span class="badge bg-<?php echo $admin['role'] === 'super_admin' ? 'danger' : 'primary'; ?>">
+                                                    <?php echo ucfirst($admin['role']); ?>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-<?php echo $admin['is_active'] ? 'success' : 'danger'; ?>">
+                                                    <?php echo $admin['is_active'] ? 'Active' : 'Inactive'; ?>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <?php if ($admin['id'] != $_SESSION['admin_id']): ?>
+                                                    <a href="manage_admins.php?action=toggle&id=<?php echo $admin['id']; ?>" 
+                                                       class="btn btn-sm btn-<?php echo $admin['is_active'] ? 'danger' : 'success'; ?>">
+                                                        <?php echo $admin['is_active'] ? 'Disable' : 'Enable'; ?>
+                                                    </a>
+                                                <?php endif; ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6" data-aos="fade-left">
+                <div class="modern-card">
+                    <div class="card-body">
                         <h5 class="card-title mb-4">Quick Actions</h5>
                         <div class="d-grid gap-3">
+                            <a href="manage_admins.php?action=add" class="btn btn-outline-primary">
+                                <i class="bi bi-person-plus me-2"></i>Add New Admin
+                            </a>
                             <a href="students/add.php" class="btn btn-outline-primary">
                                 <i class="bi bi-person-plus me-2"></i>Add New Student
                             </a>
@@ -161,7 +211,11 @@ $recent_activities = $pdo->query("
                     </div>
                 </div>
             </div>
-            <div class="col-md-6" data-aos="fade-left">
+        </div>
+
+        <!-- Recent Activities -->
+        <div class="row">
+            <div class="col-12" data-aos="fade-up">
                 <div class="modern-card">
                     <div class="card-body">
                         <h5 class="card-title mb-4">Recent Activities</h5>
@@ -197,7 +251,7 @@ $recent_activities = $pdo->query("
         <div class="container text-center">
             <p class="text-muted mb-0">
                 <i class="bi bi-stars me-2"></i>
-                TopTrack Admin Dashboard - Managing Student Excellence
+                TopTrack Super Admin Dashboard - Managing Student Excellence
             </p>
         </div>
     </footer>
