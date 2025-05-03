@@ -28,10 +28,10 @@ function sendNominationEmail($student_email, $student_name, $category, $reason) 
                 
                 <p>This recognition reflects your outstanding contributions and achievements. Keep up the excellent work!</p>
                 
-                <p>You can view your nomination and other achievements on the TopTrack platform.</p>
+                <p>You can view your nomination and other achievements on the InnoLearn platform.</p>
             </div>
             <div class='footer'>
-                <p>This is an automated message from TopTrack - Student Excellence Management System</p>
+                <p>This is an automated message from InnoLearn - Student Excellence Management System</p>
             </div>
         </div>
     </body>
@@ -41,7 +41,7 @@ function sendNominationEmail($student_email, $student_name, $category, $reason) 
     // Headers for HTML email
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-    $headers .= 'From: TopTrack <noreply@toptrack.edu>' . "\r\n";
+    $headers .= 'From: InnoLearn <noreply@InnoLearn.edu>' . "\r\n";
     
     return mail($to, $subject, $message, $headers);
 } 

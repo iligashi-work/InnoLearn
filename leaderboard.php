@@ -82,7 +82,7 @@ while ($row = $project_stmt->fetch(PDO::FETCH_ASSOC)) {
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="index.php">TopTrack</a>
+            <a class="navbar-brand" href="index.php">InnoLearn</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -161,7 +161,7 @@ while ($row = $project_stmt->fetch(PDO::FETCH_ASSOC)) {
 
     <footer class="bg-light mt-5 py-3">
         <div class="container text-center">
-            <p class="text-muted mb-0">TopTrack - Showcasing Student Excellence</p>
+            <p class="text-muted mb-0">InnoLearn - Showcasing Student Excellence</p>
         </div>
     </footer>
 

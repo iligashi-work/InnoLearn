@@ -112,7 +112,7 @@ $categories = ['Web Development', 'Mobile App', 'Machine Learning', 'Data Scienc
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($project['title']); ?> - TopTrack</title>
+    <title><?php echo htmlspecialchars($project['title']); ?> - InnoLearn</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -179,7 +179,7 @@ $categories = ['Web Development', 'Mobile App', 'Machine Learning', 'Data Scienc
 
     <nav class="navbar navbar-expand-lg navbar-light bg-white">
         <div class="container">
-            <a class="navbar-brand" href="index.php">TopTrack</a>
+            <a class="navbar-brand" href="index.php">InnoLearn</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -293,7 +293,7 @@ $categories = ['Web Development', 'Mobile App', 'Machine Learning', 'Data Scienc
         <div class="container text-center">
             <p class="text-muted mb-0">
                 <i class="bi bi-stars me-2"></i>
-                TopTrack - Student Excellence Management System
+                InnoLearn - Student Excellence Management System
             </p>
         </div>
     </footer>
