@@ -188,6 +188,9 @@ $recent_activities = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <a href="nominations/create.php" class="btn btn-outline-primary">
                                 <i class="bi bi-star me-2"></i>Create Nomination
                             </a>
+                            <a href="auto_grade.php" class="btn btn-outline-success">
+                                <i class="bi bi-check-circle me-2"></i>Auto-Grade Projects
+                            </a>
                         </div>
                     </div>
                 </div>

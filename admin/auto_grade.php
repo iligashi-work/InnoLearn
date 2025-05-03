@@ -75,29 +75,54 @@ function analyzeImages($project_id, $pdo) {
     $score = 0;
     $feedback = [];
     
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM project_images WHERE project_id = ?");
+    // Get project description
+    $stmt = $pdo->prepare("SELECT description FROM projects WHERE id = ?");
     $stmt->execute([$project_id]);
-    $image_count = $stmt->fetchColumn();
+    $description = $stmt->fetchColumn();
     
-    if ($image_count >= 3) {
-        $score += 0.3;
-        $feedback[] = "Good number of supporting images provided";
-    } else {
-        $feedback[] = "Consider adding more visual materials";
-    }
-    
-    // Check image quality
-    $stmt = $pdo->prepare("SELECT image_path FROM project_images WHERE project_id = ?");
-    $stmt->execute([$project_id]);
-    $images = $stmt->fetchAll(PDO::FETCH_COLUMN);
-    
-    foreach ($images as $image_path) {
-        $image_info = getimagesize('../' . $image_path);
-        if ($image_info[0] >= 800 && $image_info[1] >= 600) {
-            $score += 0.1;
-            $feedback[] = "High-quality images provided";
-            break;
+    if ($description) {
+        // Check for image references in description
+        $image_count = 0;
+        
+        // Look for common image reference patterns
+        $patterns = [
+            '/!\[.*?\]\(.*?\)/',  // Markdown image syntax
+            '/<img.*?src=["\'](.*?)["\'].*?>/',  // HTML img tag
+            '/\[image:.*?\]/',  // Custom image syntax
+            '/image:.*?\.(jpg|jpeg|png|gif)/i'  // Direct image references
+        ];
+        
+        foreach ($patterns as $pattern) {
+            if (preg_match_all($pattern, $description, $matches)) {
+                $image_count += count($matches[0]);
+            }
         }
+        
+        if ($image_count >= 3) {
+            $score += 0.3;
+            $feedback[] = "Good number of image references found in description ($image_count)";
+        } else {
+            $feedback[] = "Consider adding more image references to the description (found $image_count)";
+        }
+        
+        // Check for image quality indicators in description
+        $quality_indicators = [
+            'high resolution',
+            'high quality',
+            'detailed image',
+            'clear picture',
+            'professional photo'
+        ];
+        
+        foreach ($quality_indicators as $indicator) {
+            if (stripos($description, $indicator) !== false) {
+                $score += 0.1;
+                $feedback[] = "Description mentions high-quality images";
+                break;
+            }
+        }
+    } else {
+        $feedback[] = "No project description found";
     }
     
     return ['score' => $score, 'feedback' => $feedback];
@@ -221,7 +246,9 @@ $stmt = $pdo->prepare("
     SELECT p.*, s.first_name, s.last_name, s.department
     FROM projects p
     JOIN students s ON p.student_id = s.id
-    WHERE s.admin_id = ? AND p.grade IS NULL
+    WHERE s.admin_id = ? AND p.id NOT IN (
+        SELECT project_id FROM project_grades
+    )
     ORDER BY p.submission_date DESC
 ");
 $stmt->execute([$_SESSION['admin_id']]);
@@ -248,28 +275,23 @@ if (isset($_POST['grade_project'])) {
             // Grade the project
             $result = gradeProject($project, $pdo);
             
-            // Update project with grade and feedback
+            // Store the grade in project_grades table
             $stmt = $pdo->prepare("
-                UPDATE projects 
-                SET grade = ?, 
-                    feedback = ?,
-                    graded_by = ?,
-                    grading_date = NOW()
-                WHERE id = ?
+                INSERT INTO project_grades (project_id, grade, feedback, graded_by, graded_at)
+                VALUES (?, ?, ?, ?, NOW())
             ");
             $stmt->execute([
+                $project_id,
                 $result['grade'],
                 implode("\n", $result['feedback']),
-                $_SESSION['admin_id'],
-                $project_id
+                $_SESSION['admin_id']
             ]);
             
             // Send notification to student
             sendNotification($project['student_id'], $project_id, $result['grade'], $pdo);
             
             $pdo->commit();
-            header('Location: auto_grade.php?success=1');
-            exit();
+            $success = "Project graded successfully!";
         } catch (Exception $e) {
             $pdo->rollBack();
             $error = "Error grading project: " . $e->getMessage();
@@ -300,7 +322,7 @@ if (isset($_POST['grade_project'])) {
                         <?php if (isset($_GET['success'])): ?>
                             <div class="alert alert-success">
                                 <i class="bi bi-check-circle me-2"></i>
-                                Project graded successfully! Student has been notified.
+                                <?php echo $success; ?>
                             </div>
                         <?php endif; ?>
 

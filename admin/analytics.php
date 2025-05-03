@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../config/database.php';
+require_once '../config/openai.php'; // We'll create this file for API configuration
 
 // Check if admin is logged in
 if (!isset($_SESSION['admin_id'])) {
@@ -73,6 +74,32 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$admin_id]);
 $monthly_nominations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Function to generate AI insights
+function generateInsights($data, $type) {
+    global $openai;
+    
+    $prompt = "Analyze the following $type data and provide 3 key insights: " . json_encode($data);
+    
+    try {
+        $response = $openai->chat->create([
+            'model' => 'gpt-3.5-turbo',
+            'messages' => [
+                ['role' => 'system', 'content' => 'You are an analytics expert. Provide concise, actionable insights.'],
+                ['role' => 'user', 'content' => $prompt]
+            ]
+        ]);
+        
+        return $response->choices[0]->message->content;
+    } catch (Exception $e) {
+        return "Unable to generate insights at this time.";
+    }
+}
+
+// Generate insights for each category
+$department_insights = getDeepSeekInsights($department_stats, 'department distribution');
+$project_insights = getDeepSeekInsights($project_stats, 'project categories');
+$nomination_insights = getDeepSeekInsights($nomination_stats, 'nomination categories');
 ?>
 
 <!DOCTYPE html>
@@ -149,6 +176,10 @@ $monthly_nominations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="card-body">
                         <h5 class="card-title">Department Distribution</h5>
                         <canvas id="departmentChart"></canvas>
+                        <div class="insights-container mt-3">
+                            <h6 class="text-muted">AI Insights:</h6>
+                            <p class="insights-text"><?php echo nl2br(htmlspecialchars($department_insights)); ?></p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -159,6 +190,10 @@ $monthly_nominations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="card-body">
                         <h5 class="card-title">Project Categories</h5>
                         <canvas id="projectChart"></canvas>
+                        <div class="insights-container mt-3">
+                            <h6 class="text-muted">AI Insights:</h6>
+                            <p class="insights-text"><?php echo nl2br(htmlspecialchars($project_insights)); ?></p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -171,6 +206,10 @@ $monthly_nominations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="card-body">
                         <h5 class="card-title">Nomination Categories</h5>
                         <canvas id="nominationChart"></canvas>
+                        <div class="insights-container mt-3">
+                            <h6 class="text-muted">AI Insights:</h6>
+                            <p class="insights-text"><?php echo nl2br(htmlspecialchars($nomination_insights)); ?></p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -181,6 +220,68 @@ $monthly_nominations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="card-body">
                         <h5 class="card-title">Monthly Activity</h5>
                         <canvas id="activityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Documentation Section -->
+    <div class="container mt-5 mb-5">
+        <div class="row">
+            <div class="col-12">
+                <div class="modern-card">
+                    <h3 class="mb-4">Analytics Documentation</h3>
+                    
+                    <div class="documentation-item mb-4">
+                        <h5>Department Distribution</h5>
+                        <p>This chart shows the distribution of students across different departments. It helps identify:</p>
+                        <ul>
+                            <li>Most popular departments</li>
+                            <li>Student distribution across departments</li>
+                            <li>Department-wise student engagement</li>
+                        </ul>
+                    </div>
+
+                    <div class="documentation-item mb-4">
+                        <h5>Project Categories</h5>
+                        <p>This visualization displays the types of projects students are working on. It helps track:</p>
+                        <ul>
+                            <li>Most common project types</li>
+                            <li>Project category distribution</li>
+                            <li>Student interests and trends</li>
+                        </ul>
+                    </div>
+
+                    <div class="documentation-item mb-4">
+                        <h5>Nomination Categories</h5>
+                        <p>This chart shows the distribution of student nominations across different categories. It helps monitor:</p>
+                        <ul>
+                            <li>Recognition patterns</li>
+                            <li>Student achievements by category</li>
+                            <li>Nomination trends</li>
+                        </ul>
+                    </div>
+
+                    <div class="documentation-item">
+                        <h5>Monthly Activity</h5>
+                        <p>This timeline chart tracks project submissions and nominations over time. It helps analyze:</p>
+                        <ul>
+                            <li>Activity trends throughout the year</li>
+                            <li>Peak periods of student engagement</li>
+                            <li>Comparison between projects and nominations</li>
+                        </ul>
+                    </div>
+
+                    <div class="mt-4">
+                        <h5>AI Insights</h5>
+                        <p>Each chart includes AI-generated insights that provide:</p>
+                        <ul>
+                            <li>Key observations about the data</li>
+                            <li>Trend analysis and patterns</li>
+                            <li>Actionable recommendations</li>
+                        </ul>
+                        <p class="text-muted small">Note: If the AI service is unavailable, basic statistical insights will be provided instead.</p>
                     </div>
                 </div>
             </div>
@@ -317,6 +418,38 @@ $monthly_nominations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 }
             }
         });
+
+        // Auto-refresh data every 5 minutes
+        setInterval(function() {
+            fetch('analytics_data.php')
+                .then(response => response.json())
+                .then(data => {
+                    updateCharts(data);
+                });
+        }, 300000);
+
+        function updateCharts(data) {
+            // Update department chart
+            departmentChart.data.labels = data.department_stats.map(item => item.department);
+            departmentChart.data.datasets[0].data = data.department_stats.map(item => item.count);
+            departmentChart.update();
+
+            // Update project chart
+            projectChart.data.labels = data.project_stats.map(item => item.category);
+            projectChart.data.datasets[0].data = data.project_stats.map(item => item.count);
+            projectChart.update();
+
+            // Update nomination chart
+            nominationChart.data.labels = data.nomination_stats.map(item => item.category);
+            nominationChart.data.datasets[0].data = data.nomination_stats.map(item => item.count);
+            nominationChart.update();
+
+            // Update activity chart
+            activityChart.data.labels = data.monthly_projects.map(item => item.month);
+            activityChart.data.datasets[0].data = data.monthly_projects.map(item => item.count);
+            activityChart.data.datasets[1].data = data.monthly_nominations.map(item => item.count);
+            activityChart.update();
+        }
     </script>
 </body>
 </html> 
