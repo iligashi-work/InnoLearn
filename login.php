@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     if ($admin) {
         $_SESSION['admin_id'] = $admin['id'];
         $_SESSION['admin_username'] = $admin['username'];
-        header('Location: admins/dashboard.php');
+        header('Location: admin/dashboard.php');
         exit();
     } else{
         $error = "Invalid username or password";
