@@ -226,7 +226,7 @@ try {
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
         <div class="container">
             <a class="navbar-brand" href="index.php">
-                <i class="bi bi-stars me-2"></i>TopTrack
+                <i class="bi bi-stars me-2"></i>InnoLearn
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -298,7 +298,7 @@ try {
     <!-- Features Section -->
     <section class="py-5">
         <div class="container">
-            <h2 class="section-title" data-aos="fade-up">Why Choose TopTrack?</h2>
+            <h2 class="section-title" data-aos="fade-up">Why Choose InnoLearn?</h2>
             <div class="row">
                 <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
                     <div class="feature-card">
@@ -371,7 +371,7 @@ try {
             <div class="row justify-content-center">
                 <div class="col-lg-8" data-aos="fade-up">
                     <h2 class="mb-4">Ready to Showcase Your Excellence?</h2>
-                    <p class="mb-4">Join TopTrack today and become part of a thriving community of achievers.</p>
+                    <p class="mb-4">Join InnoLearn today and become part of a thriving community of achievers.</p>
                     <a href="student_login.php" class="btn cta-button primary">
                         <i class="bi bi-arrow-right-circle me-2"></i>Get Started
                     </a>
@@ -384,7 +384,7 @@ try {
         <div class="container text-center">
             <p class="text-muted mb-0">
                 <i class="bi bi-stars me-2"></i>
-                TopTrack - Student Excellence Management System
+                InnoLearn - Student Excellence Management System
             </p>
         </div>
     </footer>
