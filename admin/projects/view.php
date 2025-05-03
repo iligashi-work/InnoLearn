@@ -58,6 +58,9 @@ if (!$project) {
             background-color: #0056b3;
             border-color: #0056b3;
         }
+        .modern-card{
+            padding:20px;
+        }
     </style>
 </head>
 <body>
