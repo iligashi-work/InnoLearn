@@ -12,12 +12,19 @@ if (!isset($_SESSION['admin_id'])) {
 $admin_id = $_SESSION['admin_id'];
 
 // Fetch students for the logged-in admin
-$students = $pdo->prepare("
+$stmt = $pdo->prepare("
     SELECT id, first_name, last_name, department
     FROM students
     WHERE admin_id = ?
     ORDER BY first_name, last_name
-")->execute([$admin_id])->fetchAll(PDO::FETCH_ASSOC);
+");
+
+if ($stmt->execute([$admin_id])) {
+    $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    $students = []; // Default to an empty array if the query fails
+    $error_message = "Failed to fetch students. Please try again later.";
+}
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -223,4 +230,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         })();
     </script>
 </body>
-</html> 
+</html>

@@ -102,7 +102,7 @@ $nominations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <div class="card-body">
                                 <h5 class="card-title"><?php echo htmlspecialchars($nomination['category']); ?></h5>
                                 <p class="card-text text-muted">
-                                    <?php echo htmlspecialchars($nomination['description']); ?>
+                                    <?php echo htmlspecialchars($nomination['description'] ?? 'No description available.'); ?>
                                 </p>
                                 <div class="nomination-meta">
                                     <span class="badge bg-primary">
@@ -161,4 +161,4 @@ $nominations = $stmt->fetchAll(PDO::FETCH_ASSOC);
         });
     </script>
 </body>
-</html> 
+</html>

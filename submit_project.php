@@ -25,29 +25,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             // Handle project file upload
             $project_file = null;
-            if (isset($_FILES['project_file']) && $_FILES['project_file']['error'] === UPLOAD_ERR_OK) {
-                $allowed_types = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-                $file_type = $_FILES['project_file']['type'];
-                
-                if (in_array($file_type, $allowed_types)) {
-                    $upload_dir = 'uploads/projects/';
-                    if (!file_exists($upload_dir)) {
-                        mkdir($upload_dir, 0777, true);
-                    }
-                    
-                    $file_extension = pathinfo($_FILES['project_file']['name'], PATHINFO_EXTENSION);
-                    $file_name = 'project_' . time() . '_' . $_SESSION['student_id'] . '.' . $file_extension;
-                    $target_path = $upload_dir . $file_name;
-                    
-                    if (move_uploaded_file($_FILES['project_file']['tmp_name'], $target_path)) {
-                        $project_file = $target_path;
-                    } else {
-                        $error_message = "Failed to upload project file";
-                    }
-                } else {
-                    $error_message = "Invalid file type. Please upload a PDF or Word document.";
-                }
-            }
+
+if (isset($_FILES['project_file']) && $_FILES['project_file']['error'] === UPLOAD_ERR_OK) {
+    $allowed_types = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'image/png',
+        'image/jpeg',
+        'image/jpg'
+    ];
+
+    $file_type = $_FILES['project_file']['type'];
+
+    if (in_array($file_type, $allowed_types)) {
+        $upload_dir = 'uploads/projects/';
+        if (!file_exists($upload_dir)) {
+            mkdir($upload_dir, 0777, true);
+        }
+
+        $file_extension = pathinfo($_FILES['project_file']['name'], PATHINFO_EXTENSION);
+        $file_name = 'project_' . time() . '_' . $_SESSION['student_id'] . '.' . $file_extension;
+        $target_path = $upload_dir . $file_name;
+
+        if (move_uploaded_file($_FILES['project_file']['tmp_name'], $target_path)) {
+            $project_file = $target_path;
+        } else {
+            $error_message = "Failed to upload project file.";
+        }
+    } else {
+        $error_message = "Invalid file type. Please upload a PDF, Word document, or image file (PNG, JPG, JPEG).";
+    }
+}
+
             
             if (empty($error_message)) {
                 // Insert project into database
@@ -70,6 +80,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Fetch available project categories
 $categories = ['Web Development', 'Mobile App', 'Machine Learning', 'Data Science', 'IoT', 'Cybersecurity', 'Game Development', 'Other'];
+?>
+
+<?php
+$stmt = $pdo->prepare("
+    SELECT id, first_name, last_name, department
+    FROM students
+    WHERE admin_id = ?
+    ORDER BY first_name, last_name
+");
+
+if ($stmt->execute([$admin_id])) {
+    $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    // Log the SQL error for debugging
+    error_log("SQL Error: " . print_r($stmt->errorInfo(), true));
+    $students = []; // Default to an empty array if the query fails
+    $error_message = "Failed to fetch students. Please try again later.";
+}
 ?>
 
 <!DOCTYPE html>
@@ -198,7 +226,7 @@ $categories = ['Web Development', 'Mobile App', 'Machine Learning', 'Data Scienc
                                        class="form-control" 
                                        id="project_file" 
                                        name="project_file" 
-                                       accept=".pdf,.doc,.docx">
+                                       accept=".pdf,.doc,.docx,.png,.jpg,.jpeg">
                                 <div class="form-text">Upload your project documentation (max 10MB)</div>
                             </div>
 
@@ -253,4 +281,4 @@ $categories = ['Web Development', 'Mobile App', 'Machine Learning', 'Data Scienc
         })()
     </script>
 </body>
-</html> 
+</html>
