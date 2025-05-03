@@ -1,3 +1,28 @@
+<?php
+session_start();
+require_once 'config/database.php';
+
+// Fetch some statistics for the hero section
+try {
+    $stats = [
+        'students' => $pdo->query("SELECT COUNT(DISTINCT id) FROM students")->fetchColumn(),
+        'projects' => $pdo->query("SELECT COUNT(DISTINCT id) FROM projects")->fetchColumn(),
+        'nominations' => $pdo->query("SELECT COUNT(DISTINCT id) FROM nominations")->fetchColumn()
+    ];
+    
+    // Fetch featured projects
+    $featured_projects = $pdo->query("
+        SELECT p.*, s.first_name, s.last_name, s.department 
+        FROM projects p 
+        JOIN students s ON p.student_id = s.id 
+        ORDER BY p.created_at DESC 
+        LIMIT 3
+    ")->fetchAll();
+} catch (PDOException $e) {
+    $stats = ['students' => 0, 'projects' => 0, 'nominations' => 0];
+    $featured_projects = [];
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
