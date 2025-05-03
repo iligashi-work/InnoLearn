@@ -77,6 +77,9 @@ while ($row = $project_stmt->fetch(PDO::FETCH_ASSOC)) {
             border: 3px solid #fff;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
+        .modern-card{
+            padding:20px;
+        }
     </style>
 </head>
 <body>

@@ -81,6 +81,11 @@ $admins = $pdo->query("SELECT * FROM admins ORDER BY role DESC, username")->fetc
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
+    <style>
+        .modern-card{
+            padding:20px;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light">

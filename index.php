@@ -212,6 +212,9 @@ try {
                 margin-bottom: 1rem;
             }
         }
+        .modern-card{
+            padding:20px;
+        }
     </style>
 </head>
 <body>
