@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard - TopTrack</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="index.php">TopTrack</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="public_gallery.php">Gallery</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="admin/login.php">Admin Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="text-center mb-5">
+            <h1 class="display-4">Student Excellence Leaderboard</h1>
+            <p class="lead text-muted">Celebrating our top achievers and their accomplishments</p>
+        </div>
+
+        <div class="row g-4">
+            <?php 
+            $rank = 1;
+            foreach ($top_students as $student): 
+                $achievements = explode(',', $student['achievements']);
+                $achievements = array_unique(array_filter($achievements));
+            ?>
+                <div class="col-md-6 col-lg-4">
+                    <div class="card student-card position-relative">
+                        <div class="rank-badge">
+                            <?php echo $rank++; ?>
+                        </div>
+                        <div class="card-body text-center">
+                            <img src="<?php echo htmlspecialchars($student['profile_image']); ?>" 
+                                 alt="Profile" 
+                                 class="profile-image mb-3">
+                            <h5 class="card-title">
+                                <?php echo htmlspecialchars($student['first_name'] . ' ' . $student['last_name']); ?>
+                            </h5>
+                            <p class="text-muted mb-2">
+                                <?php echo htmlspecialchars($student['department']); ?> | 
+                                ID: <?php echo htmlspecialchars($student['student_id']); ?>
+                            </p>
+                            <div class="d-flex justify-content-center gap-3 mb-3">
+                                <div class="text-center">
+                                    <h4 class="mb-0"><?php echo $student['nomination_count']; ?></h4>
+                                    <small class="text-muted">Nominations</small>
+                                </div>
+                                <div class="text-center">
+                                    <h4 class="mb-0"><?php echo $project_stats[$student['id']] ?? 0; ?></h4>
+                                    <small class="text-muted">Projects</small>
+                                </div>
+                            </div>
+                            <div class="achievements">
+                                <?php foreach ($achievements as $achievement): ?>
+                                    <span class="badge bg-success achievement-badge">
+                                        <?php echo htmlspecialchars($achievement); ?>
+                                    </span>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="text-center mt-5">
+            <p class="text-muted">
+                Rankings are based on nominations, project submissions, and overall achievements.
+                <br>Updated in real-time as new nominations and projects are added.
+            </p>
+        </div>
+    </div>
+
+    <footer class="bg-light mt-5 py-3">
+        <div class="container text-center">
+            <p class="text-muted mb-0">TopTrack - Showcasing Student Excellence</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
