@@ -1,3 +1,39 @@
+<?php
+require_once 'config/database.php';
+
+// Get top students based on nominations
+$nominations_query = "SELECT 
+    s.id,
+    s.student_id,
+    s.first_name,
+    s.last_name,
+    s.department,
+    s.profile_image,
+    COUNT(n.id) as nomination_count,
+    GROUP_CONCAT(DISTINCT n.category) as achievements
+FROM students s
+LEFT JOIN nominations n ON s.id = n.student_id
+GROUP BY s.id
+ORDER BY nomination_count DESC, s.first_name
+LIMIT 10";
+
+$nominations_stmt = $pdo->query($nominations_query);
+$top_students = $nominations_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Get project statistics
+$project_query = "SELECT 
+    s.id,
+    COUNT(p.id) as project_count
+FROM students s
+LEFT JOIN projects p ON s.id = p.student_id
+GROUP BY s.id";
+
+$project_stmt = $pdo->query($project_query);
+$project_stats = [];
+while ($row = $project_stmt->fetch(PDO::FETCH_ASSOC)) {
+    $project_stats[$row['id']] = $row['project_count'];
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
