@@ -23,6 +23,7 @@ try {
     $featured_projects = [];
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,7 +37,7 @@ try {
     <link rel="stylesheet" href="style.css">
     <style>
         .hero-section {
-            background: linear-gradient(135deg, #19C7E6, #8f94fb);
+            background: linear-gradient(135deg, #4e54c8, #8f94fb);
             color: white;
             padding: 100px 0;
             position: relative;
@@ -83,7 +84,7 @@ try {
 
         .feature-icon {
             font-size: 2.5rem;
-            color: #19C7E6;
+            color: #4e54c8;
             margin-bottom: 1rem;
         }
 
@@ -117,7 +118,7 @@ try {
 
         .cta-button.primary {
             background: #fff;
-            color: #19C7E6;
+            color: #4e54c8;
         }
 
         .cta-button.primary:hover {
@@ -155,7 +156,7 @@ try {
 
         .project-image {
             height: 200px;
-            background: #19C7E6;
+            background: #4e54c8;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -183,7 +184,7 @@ try {
         .navbar-brand {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #19C7E6;
+            color: #4e54c8;
         }
 
         .nav-link {
@@ -196,7 +197,7 @@ try {
 
         .nav-link:hover {
             background: rgba(78,84,200,0.1);
-            color: #19C7E6;
+            color: #4e54c8;
         }
 
         @media (max-width: 768px) {
@@ -226,7 +227,7 @@ try {
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
         <div class="container">
             <a class="navbar-brand" href="index.php">
-                <img src="logo.png" width="75">InnoLearn
+                <i class="bi bi-stars me-2"></i>TopTrack
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -298,7 +299,7 @@ try {
     <!-- Features Section -->
     <section class="py-5">
         <div class="container">
-            <h2 class="section-title" data-aos="fade-up">Why Choose InnoLearn?</h2>
+            <h2 class="section-title" data-aos="fade-up">Why Choose TopTrack?</h2>
             <div class="row">
                 <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
                     <div class="feature-card">
@@ -371,7 +372,7 @@ try {
             <div class="row justify-content-center">
                 <div class="col-lg-8" data-aos="fade-up">
                     <h2 class="mb-4">Ready to Showcase Your Excellence?</h2>
-                    <p class="mb-4">Join InnoLearn today and become part of a thriving community of achievers.</p>
+                    <p class="mb-4">Join TopTrack today and become part of a thriving community of achievers.</p>
                     <a href="student_login.php" class="btn cta-button primary">
                         <i class="bi bi-arrow-right-circle me-2"></i>Get Started
                     </a>
@@ -384,7 +385,7 @@ try {
         <div class="container text-center">
             <p class="text-muted mb-0">
                 <i class="bi bi-stars me-2"></i>
-                InnoLearn - Student Excellence Management System
+                TopTrack - Student Excellence Management System
             </p>
         </div>
     </footer>
