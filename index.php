@@ -226,7 +226,7 @@ try {
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
         <div class="container">
             <a class="navbar-brand" href="index.php">
-                <i class="bi bi-stars me-2"></i>InnoLearn
+                <img src="logo.png" width="75">InnoLearn
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
