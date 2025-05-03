@@ -47,12 +47,228 @@ $nominations = $nominations_stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Gallery - TopTrack</title>
+    <title>Student Gallery - InnoLearn</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: linear-gradient(45deg, #2196F3, #00BCD4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .search-card {
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e0e6ed;
+            padding: 12px 20px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #2196F3;
+            box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.15);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #2196F3, #00BCD4);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        .section-title {
+            font-weight: 700;
+            color: #1a237e;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 50px;
+            height: 4px;
+            background: linear-gradient(45deg, #2196F3, #00BCD4);
+            border-radius: 2px;
+        }
+
+        .project-card {
+            background: white;
+            border: none;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .project-card:hover .overlay-hover {
+            opacity: 1 !important;
+        }
+
+        .project-card .project-thumbnail {
+            transition: transform 0.3s ease;
+        }
+
+        .project-card:hover .project-thumbnail {
+            transform: scale(1.05);
+        }
+
+        .project-card .card-body {
+            padding: 1.5rem;
+        }
+
+        .project-card .card-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1a237e;
+        }
+
+        .badge {
+            padding: 8px 15px;
+            border-radius: 30px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-primary {
+            background: linear-gradient(45deg, #2196F3, #00BCD4);
+        }
+
+        .badge-success {
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
+        }
+
+        .achievement-card {
+            background: white;
+            border: none;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .achievement-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-card {
+            background: white;
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .list-group-item {
+            border: none;
+            padding: 1rem 1.5rem;
+            margin-bottom: 0.5rem;
+            border-radius: 10px !important;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+        .list-group-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .rounded-pill {
+            padding: 8px 15px;
+        }
+
+        footer {
+            background: white !important;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Loading animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s ease;
+        }
+
+        .loading-overlay.fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #2196F3, #00BCD4);
+            border-radius: 5px;
+        }
+
+        /* Empty state styling */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #2196F3;
+            margin-bottom: 1.5rem;
+        }
+    </style>
 </head>
 <body>
     <!-- Loading Animation -->
@@ -64,7 +280,7 @@ $nominations = $nominations_stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
-            <a class="navbar-brand" href="index.php">TopTrack</a>
+            <a class="navbar-brand" href="index.php">InnoLearn</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -246,7 +462,7 @@ $nominations = $nominations_stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="container text-center">
             <p class="text-muted mb-0">
                 <i class="bi bi-stars me-2"></i>
-                TopTrack - Showcasing Student Excellence
+                InnoLearn - Showcasing Student Excellence
             </p>
         </div>
     </footer>
