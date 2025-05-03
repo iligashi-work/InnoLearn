@@ -13,6 +13,7 @@ $admin_id = $_SESSION['admin_id'];
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $student_id = $_POST['student_id'];
     $first_name = $_POST['first_name'];
     $last_name = $_POST['last_name'];
     $email = $_POST['email'];
@@ -21,11 +22,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Insert student into database
     $stmt = $pdo->prepare("
-        INSERT INTO students (first_name, last_name, email, department, class, admin_id)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO students (student_id, first_name, last_name, email, department, class, admin_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     ");
     
-    if ($stmt->execute([$first_name, $last_name, $email, $department, $class, $admin_id])) {
+    if ($stmt->execute([$student_id, $first_name, $last_name, $email, $department, $class, $admin_id])) {
         header('Location: list.php?success=1');
         exit();
     } else {
@@ -45,6 +46,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
     <link rel="stylesheet" href="../../style.css">
+    <style>
+        .l{
+            padding: 25px;
+        }
+    </style>
 </head>
 <body>
     <!-- Loading Animation -->
@@ -95,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <div class="modern-card">
+                <div class="modern-card l">
                     <div class="card-body">
                         <h2 class="section-title mb-4">Add New Student</h2>
 
@@ -107,6 +113,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <?php endif; ?>
 
                         <form method="POST" class="needs-validation" novalidate>
+                            <div class="mb-3">
+                                <label for="student_id" class="form-label">ID</label>
+                                <input type="text" class="form-control" id="student_id" name="student_id" required>
+                                <div class="invalid-feedback">
+                                    Please enter the student's ID.
+                                </div>
+                            </div>
                             <div class="mb-3">
                                 <label for="first_name" class="form-label">First Name</label>
                                 <input type="text" class="form-control" id="first_name" name="first_name" required>
