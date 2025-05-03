@@ -1,3 +1,82 @@
+<?php
+session_start();
+require_once 'config/database.php';
+
+// Check if student is logged in
+if (!isset($_SESSION['student_id'])) {
+    header('Location: student_login.php');
+    exit();
+}
+
+// Fetch student details
+$stmt = $pdo->prepare("SELECT * FROM students WHERE id = ?");
+$stmt->execute([$_SESSION['student_id']]);
+$student = $stmt->fetch();
+
+$success_message = '';
+$error_message = '';
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $first_name = trim($_POST['first_name']);
+    $last_name = trim($_POST['last_name']);
+    $email = trim($_POST['email']);
+    $department = trim($_POST['department']);
+    
+    // Validate inputs
+    if (empty($first_name) || empty($last_name) || empty($email) || empty($department)) {
+        $error_message = "All fields are required";
+    } else {
+        try {
+            // Handle profile image upload
+            $profile_image = $student['profile_image']; // Keep existing image by default
+            
+            if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
+                $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
+                $file_type = $_FILES['profile_image']['type'];
+                
+                if (in_array($file_type, $allowed_types)) {
+                    $upload_dir = 'uploads/students/';
+                    if (!file_exists($upload_dir)) {
+                        mkdir($upload_dir, 0777, true);
+                    }
+                    
+                    $file_extension = pathinfo($_FILES['profile_image']['name'], PATHINFO_EXTENSION);
+                    $file_name = 'profile_' . time() . '_' . $student['student_id'] . '.' . $file_extension;
+                    $target_path = $upload_dir . $file_name;
+                    
+                    if (move_uploaded_file($_FILES['profile_image']['tmp_name'], $target_path)) {
+                        $profile_image = $target_path;
+                    } else {
+                        $error_message = "Failed to upload profile image";
+                    }
+                } else {
+                    $error_message = "Invalid file type. Please upload a JPEG, PNG, or GIF image.";
+                }
+            }
+            
+            if (empty($error_message)) {
+                // Update student information
+                $stmt = $pdo->prepare("
+                    UPDATE students 
+                    SET first_name = ?, last_name = ?, email = ?, department = ?, profile_image = ?
+                    WHERE id = ?
+                ");
+                $stmt->execute([$first_name, $last_name, $email, $department, $profile_image, $_SESSION['student_id']]);
+                
+                // Update session data
+                $_SESSION['student_name'] = $first_name . ' ' . $last_name;
+                $_SESSION['student_email'] = $email;
+                $_SESSION['student_department'] = $department;
+                
+                $success_message = "Profile updated successfully!";
+            }
+        } catch (PDOException $e) {
+            $error_message = "An error occurred while updating your profile.";
+        }
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
