@@ -36,7 +36,7 @@ try {
     <link rel="stylesheet" href="style.css">
     <style>
         .hero-section {
-            background: linear-gradient(135deg, #4e54c8, #8f94fb);
+            background: linear-gradient(135deg, #19C7E6, #8f94fb);
             color: white;
             padding: 100px 0;
             position: relative;
@@ -83,7 +83,7 @@ try {
 
         .feature-icon {
             font-size: 2.5rem;
-            color: #4e54c8;
+            color: #19C7E6;
             margin-bottom: 1rem;
         }
 
@@ -117,7 +117,7 @@ try {
 
         .cta-button.primary {
             background: #fff;
-            color: #4e54c8;
+            color: #19C7E6;
         }
 
         .cta-button.primary:hover {
@@ -155,7 +155,7 @@ try {
 
         .project-image {
             height: 200px;
-            background: #4e54c8;
+            background: #19C7E6;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -183,7 +183,7 @@ try {
         .navbar-brand {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #4e54c8;
+            color: #19C7E6;
         }
 
         .nav-link {
@@ -196,7 +196,7 @@ try {
 
         .nav-link:hover {
             background: rgba(78,84,200,0.1);
-            color: #4e54c8;
+            color: #19C7E6;
         }
 
         @media (max-width: 768px) {
