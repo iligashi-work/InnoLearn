@@ -1,3 +1,47 @@
+<?php
+require_once 'config/database.php';
+
+// Get search parameters
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$category = isset($_GET['category']) ? $_GET['category'] : '';
+
+// Get unique categories for the dropdown
+$categories_query = "SELECT DISTINCT category FROM projects ORDER BY category";
+$categories_stmt = $pdo->query($categories_query);
+$categories = $categories_stmt->fetchAll(PDO::FETCH_COLUMN);
+
+// Fetch projects with student details
+$projects_query = "SELECT p.*, s.first_name, s.last_name, s.student_id as student_number 
+                  FROM projects p 
+                  JOIN students s ON p.student_id = s.id 
+                  WHERE 1=1";
+$params = [];
+
+if ($search) {
+    $projects_query .= " AND (p.title LIKE ? OR p.description LIKE ? OR s.first_name LIKE ? OR s.last_name LIKE ?)";
+    $search_term = "%$search%";
+    array_push($params, $search_term, $search_term, $search_term, $search_term);
+}
+
+if ($category) {
+    $projects_query .= " AND p.category = ?";
+    array_push($params, $category);
+}
+
+$projects_query .= " ORDER BY p.submission_date DESC";
+$projects_stmt = $pdo->prepare($projects_query);
+$projects_stmt->execute($params);
+$projects = $projects_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch recent nominations with student details
+$nominations_query = "SELECT n.*, s.first_name, s.last_name, s.student_id as student_number 
+                     FROM nominations n 
+                     JOIN students s ON n.student_id = s.id 
+                     ORDER BY n.nomination_date DESC 
+                     LIMIT 10";
+$nominations_stmt = $pdo->query($nominations_query);
+$nominations = $nominations_stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
