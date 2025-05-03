@@ -8,30 +8,19 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
-// Handle deletion if requested
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_nomination'])) {
-    $nomination_id = $_POST['nomination_id'];
-    
-    $stmt = $pdo->prepare("DELETE FROM nominations WHERE id = ?");
-    if ($stmt->execute([$nomination_id])) {
-        $success_message = "Nomination deleted successfully!";
-    } else {
-        $error_message = "Error deleting nomination!";
-    }
-}
+// Get admin ID
+$admin_id = $_SESSION['admin_id'];
 
-// Fetch all nominations with student and admin details
-$query = "SELECT n.*, 
-          s.student_id as student_number, 
-          s.first_name, 
-          s.last_name,
-          a.username as nominated_by_username
-          FROM nominations n
-          JOIN students s ON n.student_id = s.id
-          JOIN admins a ON n.nominated_by = a.id
-          ORDER BY n.nomination_date DESC";
-
-$stmt = $pdo->query($query);
+// Fetch nominations for the logged-in admin's students
+$stmt = $pdo->prepare("
+    SELECT n.*, s.first_name, s.last_name, s.department,
+           (SELECT p.title FROM projects p WHERE p.student_id = s.id ORDER BY p.submission_date DESC LIMIT 1) as project_title
+    FROM nominations n
+    JOIN students s ON n.student_id = s.id
+    WHERE s.admin_id = ?
+    ORDER BY n.nomination_date DESC
+");
+$stmt->execute([$admin_id]);
 $nominations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -40,93 +29,136 @@ $nominations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nominations - InnoLearn</title>
-    <link rel="stylesheet" href="../../style.css">
+    <title>My Nominations - TopTrack</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <!-- Loading Animation -->
+    <div class="loading-overlay">
+        <div class="spinner-grow text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
-            <a class="navbar-brand" href="../dashboard.php">InnoLearn</a>
+            <a class="navbar-brand" href="../dashboard.php">TopTrack Admin</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="../dashboard.php">Dashboard</a>
+                        <a class="nav-link" href="../students/list.php">
+                            <i class="bi bi-people"></i> My Students
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../logout.php">Logout</a>
+                        <a class="nav-link" href="../projects/list.php">
+                            <i class="bi bi-folder"></i> My Projects
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="list.php">
+                            <i class="bi bi-trophy"></i> My Nominations
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../analytics.php">
+                            <i class="bi bi-graph-up"></i> Analytics
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../logout.php">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Manage Nominations</h2>
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <h2 class="section-title mb-0">My Nominations</h2>
             <a href="create.php" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Create New Nomination
+                <i class="bi bi-plus-circle me-2"></i>Create New Nomination
             </a>
         </div>
 
-        <?php if (isset($success_message)): ?>
-            <div class="alert alert-success"><?php echo $success_message; ?></div>
+        <?php if (empty($nominations)): ?>
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>No nominations found. Create your first nomination to get started.
+            </div>
+        <?php else: ?>
+            <div class="row g-4">
+                <?php foreach ($nominations as $nomination): ?>
+                    <div class="col-md-6 col-lg-4" data-aos="fade-up">
+                        <div class="modern-card nomination-card">
+                            <div class="card-body">
+                                <h5 class="card-title"><?php echo htmlspecialchars($nomination['category']); ?></h5>
+                                <p class="card-text text-muted">
+                                    <?php echo htmlspecialchars($nomination['description']); ?>
+                                </p>
+                                <div class="nomination-meta">
+                                    <span class="badge bg-primary">
+                                        <i class="bi bi-person me-1"></i>
+                                        <?php echo htmlspecialchars($nomination['first_name'] . ' ' . $nomination['last_name']); ?>
+                                    </span>
+                                    <span class="badge bg-secondary">
+                                        <i class="bi bi-building me-1"></i>
+                                        <?php echo htmlspecialchars($nomination['department']); ?>
+                                    </span>
+                                    <?php if ($nomination['project_title']): ?>
+                                        <span class="badge bg-info">
+                                            <i class="bi bi-folder me-1"></i>
+                                            <?php echo htmlspecialchars($nomination['project_title']); ?>
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="mt-3">
+                                    <a href="view.php?id=<?php echo $nomination['id']; ?>" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-eye me-1"></i>View Details
+                                    </a>
+                                    <a href="edit.php?id=<?php echo $nomination['id']; ?>" class="btn btn-outline-secondary btn-sm">
+                                        <i class="bi bi-pencil me-1"></i>Edit
+                                    </a>
+                                    <a href="delete.php?id=<?php echo $nomination['id']; ?>" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure you want to delete this nomination?')">
+                                        <i class="bi bi-trash me-1"></i>Delete
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         <?php endif; ?>
-
-        <?php if (isset($error_message)): ?>
-            <div class="alert alert-danger"><?php echo $error_message; ?></div>
-        <?php endif; ?>
-
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Student</th>
-                        <th>Category</th>
-                        <th>Reason</th>
-                        <th>Nominated By</th>
-                        <th>Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($nominations as $nomination): ?>
-                        <tr>
-                            <td>
-                                <?php echo htmlspecialchars($nomination['student_number'] . ' - ' . 
-                                      $nomination['first_name'] . ' ' . $nomination['last_name']); ?>
-                            </td>
-                            <td><?php echo htmlspecialchars($nomination['category']); ?></td>
-                            <td><?php echo htmlspecialchars($nomination['reason']); ?></td>
-                            <td><?php echo htmlspecialchars($nomination['nominated_by_username']); ?></td>
-                            <td><?php echo date('M d, Y H:i', strtotime($nomination['nomination_date'])); ?></td>
-                            <td>
-                                <a href="edit.php?id=<?php echo $nomination['id']; ?>" class="btn btn-sm btn-primary">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <form method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this nomination?');">
-                                    <input type="hidden" name="nomination_id" value="<?php echo $nomination['id']; ?>">
-                                    <button type="submit" name="delete_nomination" class="btn btn-sm btn-danger">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                    <?php if (empty($nominations)): ?>
-                        <tr>
-                            <td colspan="6" class="text-center">No nominations found.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
     </div>
 
+    <footer>
+        <div class="container text-center">
+            <p class="text-muted mb-0">
+                <i class="bi bi-stars me-2"></i>
+                TopTrack Admin Dashboard - Managing Student Excellence
+            </p>
+        </div>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+
+        window.addEventListener('load', function() {
+            document.querySelector('.loading-overlay').classList.add('fade-out');
+        });
+    </script>
 </body>
 </html> 

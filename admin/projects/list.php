@@ -8,26 +8,19 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
-// Handle project deletion
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_project'])) {
-    $project_id = $_POST['project_id'];
-    
-    // Delete project from database
-    $stmt = $pdo->prepare("DELETE FROM projects WHERE id = ?");
-    
-    if ($stmt->execute([$project_id])) {
-        $success_message = "Project deleted successfully!";
-    } else {
-        $error_message = "Error deleting project";
-    }
-}
+// Get admin ID
+$admin_id = $_SESSION['admin_id'];
 
-// Fetch all projects with student information
-$query = "SELECT p.*, s.first_name, s.last_name, s.student_id 
-          FROM projects p 
-          JOIN students s ON p.student_id = s.id 
-          ORDER BY p.submission_date DESC";
-$stmt = $pdo->query($query);
+// Fetch projects for the logged-in admin's students
+$stmt = $pdo->prepare("
+    SELECT p.*, s.first_name, s.last_name, s.department,
+           (SELECT COUNT(*) FROM nominations n WHERE n.student_id = s.id) as nomination_count
+    FROM projects p
+    JOIN students s ON p.student_id = s.id
+    WHERE s.admin_id = ?
+    ORDER BY p.submission_date DESC
+");
+$stmt->execute([$admin_id]);
 $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -36,93 +29,134 @@ $projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Projects - InnoLearn</title>
-    <link rel="stylesheet" href="../../style.css">
+    <title>My Projects - TopTrack</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <!-- Loading Animation -->
+    <div class="loading-overlay">
+        <div class="spinner-grow text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
-            <a class="navbar-brand" href="../dashboard.php">InnoLearn</a>
+            <a class="navbar-brand" href="../dashboard.php">TopTrack Admin</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="../dashboard.php">Dashboard</a>
+                        <a class="nav-link" href="../students/list.php">
+                            <i class="bi bi-people"></i> My Students
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../logout.php">Logout</a>
+                        <a class="nav-link active" href="list.php">
+                            <i class="bi bi-folder"></i> My Projects
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../nominations/list.php">
+                            <i class="bi bi-trophy"></i> My Nominations
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../analytics.php">
+                            <i class="bi bi-graph-up"></i> Analytics
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../logout.php">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Manage Projects</h2>
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <h2 class="section-title mb-0">My Projects</h2>
             <a href="add.php" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Add New Project
+                <i class="bi bi-file-earmark-plus me-2"></i>Add New Project
             </a>
         </div>
 
-        <?php if (isset($success_message)): ?>
-            <div class="alert alert-success"><?php echo $success_message; ?></div>
+        <?php if (empty($projects)): ?>
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>No projects found. Add your first project to get started.
+            </div>
+        <?php else: ?>
+            <div class="row g-4">
+                <?php foreach ($projects as $project): ?>
+                    <div class="col-md-6 col-lg-4" data-aos="fade-up">
+                        <div class="modern-card project-card">
+                            <div class="card-body">
+                                <h5 class="card-title"><?php echo htmlspecialchars($project['title']); ?></h5>
+                                <p class="card-text text-muted">
+                                    <?php echo htmlspecialchars($project['description']); ?>
+                                </p>
+                                <div class="project-meta">
+                                    <span class="badge bg-primary">
+                                        <i class="bi bi-person me-1"></i>
+                                        <?php echo htmlspecialchars($project['first_name'] . ' ' . $project['last_name']); ?>
+                                    </span>
+                                    <span class="badge bg-secondary">
+                                        <i class="bi bi-building me-1"></i>
+                                        <?php echo htmlspecialchars($project['department']); ?>
+                                    </span>
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-trophy me-1"></i>
+                                        <?php echo $project['nomination_count']; ?> Nominations
+                                    </span>
+                                </div>
+                                <div class="mt-3">
+                                    <a href="view.php?id=<?php echo $project['id']; ?>" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-eye me-1"></i>View Details
+                                    </a>
+                                    <a href="edit.php?id=<?php echo $project['id']; ?>" class="btn btn-outline-secondary btn-sm">
+                                        <i class="bi bi-pencil me-1"></i>Edit
+                                    </a>
+                                    <a href="delete.php?id=<?php echo $project['id']; ?>" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure you want to delete this project?')">
+                                        <i class="bi bi-trash me-1"></i>Delete
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         <?php endif; ?>
-
-        <?php if (isset($error_message)): ?>
-            <div class="alert alert-danger"><?php echo $error_message; ?></div>
-        <?php endif; ?>
-
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Thumbnail</th>
-                        <th>Title</th>
-                        <th>Student</th>
-                        <th>Category</th>
-                        <th>Submission Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($projects as $project): ?>
-                        <tr>
-                            <td>
-                                <img src="../../<?php echo htmlspecialchars($project['thumbnail_path']); ?>" 
-                                     alt="Project Thumbnail" 
-                                     style="width: 50px; height: 50px; object-fit: cover;">
-                            </td>
-                            <td><?php echo htmlspecialchars($project['title']); ?></td>
-                            <td>
-                                <?php echo htmlspecialchars($project['first_name'] . ' ' . $project['last_name']); ?>
-                                <br>
-                                <small class="text-muted">ID: <?php echo htmlspecialchars($project['student_id']); ?></small>
-                            </td>
-                            <td><?php echo htmlspecialchars($project['category']); ?></td>
-                            <td><?php echo date('M d, Y', strtotime($project['submission_date'])); ?></td>
-                            <td>
-                                <a href="edit.php?id=<?php echo $project['id']; ?>" class="btn btn-sm btn-primary">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <form method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this project?');">
-                                    <input type="hidden" name="project_id" value="<?php echo $project['id']; ?>">
-                                    <button type="submit" name="delete_project" class="btn btn-sm btn-danger">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
     </div>
 
+    <footer>
+        <div class="container text-center">
+            <p class="text-muted mb-0">
+                <i class="bi bi-stars me-2"></i>
+                TopTrack Admin Dashboard - Managing Student Excellence
+            </p>
+        </div>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+
+        window.addEventListener('load', function() {
+            document.querySelector('.loading-overlay').classList.add('fade-out');
+        });
+    </script>
 </body>
 </html> 

@@ -82,7 +82,9 @@ CREATE TABLE `students` (
   `class` varchar(50) NOT NULL,
   `department` varchar(100) NOT NULL,
   `profile_image` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `admin_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  FOREIGN KEY (`admin_id`) REFERENCES `admins` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
