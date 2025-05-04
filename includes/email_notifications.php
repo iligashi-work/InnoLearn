@@ -1,6 +1,11 @@
 <?php
 
 function sendNominationEmail($student_email, $student_name, $category, $reason) {
+    // Set SMTP configuration
+    ini_set("SMTP", "smtp.gmail.com");
+    ini_set("smtp_port", "587");
+    ini_set("sendmail_from", "your-email@gmail.com");
+    
     $to = $student_email;
     $subject = "Congratulations! You've Been Nominated for " . $category;
     
@@ -42,6 +47,16 @@ function sendNominationEmail($student_email, $student_name, $category, $reason) 
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
     $headers .= 'From: InnoLearn <noreply@InnoLearn.edu>' . "\r\n";
+    $headers .= 'Reply-To: noreply@InnoLearn.edu' . "\r\n";
+    $headers .= 'X-Mailer: PHP/' . phpversion();
     
-    return mail($to, $subject, $message, $headers);
+    // Send email
+    $result = mail($to, $subject, $message, $headers);
+    
+    if (!$result) {
+        error_log("Failed to send email to: $student_email");
+        return false;
+    }
+    
+    return true;
 } 
