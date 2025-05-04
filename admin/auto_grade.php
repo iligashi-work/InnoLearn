@@ -194,7 +194,7 @@ function sendNotification($student_id, $project_id, $grade, $pdo) {
     $message .= "Best regards,\nInnoLearn Team";
     
     // Send email notification
-    mail($student_email, $subject, $message);
+    // mail($student_email, $subject, $message);
     
     // Store notification in database
     $stmt = $pdo->prepare("
