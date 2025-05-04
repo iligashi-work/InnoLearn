@@ -191,7 +191,7 @@ function sendNotification($student_id, $project_id, $grade, $pdo) {
     $message .= "Your project '$project_title' has been graded.\n";
     $message .= "Grade: $grade%\n\n";
     $message .= "You can view detailed feedback by logging into your account.\n\n";
-    $message .= "Best regards,\nTopTrack Team";
+    $message .= "Best regards,\nInnoLearn Team";
     
     // Send email notification
     mail($student_email, $subject, $message);
@@ -305,7 +305,7 @@ if (isset($_POST['grade_project'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto-Grade Projects - TopTrack</title>
+    <title>Auto-Grade Projects - InnoLearn</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
