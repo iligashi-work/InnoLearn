@@ -102,6 +102,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <i class="bi bi-grid me-1"></i> Gallery
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../student_login.php">
+                            <i class="bi bi-mortarboard me-1"></i> Student Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="login.php">
+                            <i class="bi bi-shield-lock me-1"></i> Admin Login
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
