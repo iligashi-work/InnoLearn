@@ -167,9 +167,6 @@ $categories = ['Web Development', 'Mobile App', 'Machine Learning', 'Data Scienc
             padding-top: 2rem;
             border-top: 1px solid #eee;
         }
-        .modern-card{
-            padding:20px;
-        }
     </style>
 </head>
 <body>
