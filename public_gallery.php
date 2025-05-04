@@ -188,8 +188,9 @@ $nominations = $nominations_stmt->fetchAll(PDO::FETCH_ASSOC);
             margin-bottom: 1.5rem;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
+            padding: 20px;
         }
-
+        .l{padding: 20px;}
         .achievement-card:hover {
             transform: translateX(5px);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
@@ -432,7 +433,7 @@ $nominations = $nominations_stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
             <div class="col-md-4" data-aos="fade-left">
                 <div class="stats-card">
-                    <div class="card-body">
+                    <div class="card-body l">
                         <h5 class="card-title mb-4">Achievement Categories</h5>
                         <ul class="list-group list-group-flush">
                             <?php
