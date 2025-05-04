@@ -110,8 +110,8 @@ CREATE TABLE `projects` (
 --
 
 INSERT INTO `projects` (`id`, `student_id`, `title`, `description`, `category`, `file_path`, `thumbnail_path`, `submission_date`) VALUES
-(4, 2, 'noname', 'noname', 'Research', 'C:\\xampp\\htdocs\\TopTrack\\uploads\\projects\\680c13e3b0eb1.jpg', 'C:\\xampp\\htdocs\\TopTrack\\uploads\\projects\\680c13e3b0eb1.jpg', '2025-05-03 14:35:32'),
-(5, 2, 'hi', 'jyfhjhj', 'Development', NULL, NULL, '2025-05-03 22:28:01');
+(4, 2, 'noname', 'noname', 'Research', 'C:\\xampp\\htdocs\\TopTrack\\uploads\\projects\\680c13e3b0eb1.jpg', 'uploads/thumbnails/thumb_1746348290_4.png', '2025-05-03 14:35:32'),
+(5, 2, 'hi', 'jyfhjhj', 'Development', NULL, 'uploads/thumbnails/thumb_1746348290_4.png', '2025-05-03 22:28:01');
 
 -- --------------------------------------------------------
 
