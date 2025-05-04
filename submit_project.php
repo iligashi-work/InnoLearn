@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
 require_once 'config/database.php';
 
@@ -7,6 +9,7 @@ if (!isset($_SESSION['student_id'])) {
     header('Location: student_login.php');
     exit();
 }
+$admin_id = $_SESSION['admin_id'] ?? null;
 
 $success_message = '';
 $error_message = '';
@@ -58,23 +61,62 @@ if (isset($_FILES['project_file']) && $_FILES['project_file']['error'] === UPLOA
     }
 }
 
-            
+            // Handle thumbnail image upload
+$thumbnail_image = null;
+
+if (isset($_FILES['thumbnail_image']) && $_FILES['thumbnail_image']['error'] === UPLOAD_ERR_OK) {
+    $allowed_image_types = ['image/jpeg', 'image/png', 'image/jpg'];
+    $image_type = $_FILES['thumbnail_image']['type'];
+
+    if (in_array($image_type, $allowed_image_types)) {
+        $upload_dir = 'uploads/thumbnails/';
+        if (!file_exists($upload_dir)) {
+            mkdir($upload_dir, 0777, true);
+        }
+
+        $image_extension = pathinfo($_FILES['thumbnail_image']['name'], PATHINFO_EXTENSION);
+        $image_name = 'thumb_' . time() . '_' . $_SESSION['student_id'] . '.' . $image_extension;
+        $image_path = $upload_dir . $image_name;
+
+        if (move_uploaded_file($_FILES['thumbnail_image']['tmp_name'], $image_path)) {
+            $thumbnail_image = $image_path;
+        } else {
+            $error_message = "Failed to upload thumbnail image.";
+        }
+    } else {
+        $error_message = "Invalid thumbnail file type. Only JPG and PNG are allowed.";
+    }
+}
+
             if (empty($error_message)) {
                 // Insert project into database
+                // Insert project into database
                 $stmt = $pdo->prepare("
-                    INSERT INTO projects (student_id, title, description, category, github_link, file_path, created_at)
-                    VALUES (?, ?, ?, ?, ?, ?, NOW())
+                INSERT INTO projects (student_id, title, description, category, github_link, file_path, thumbnail_path, submission_date)
+                VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
                 ");
-                $stmt->execute([$_SESSION['student_id'], $title, $description, $category, $github_link, $project_file]);
-                
+                $stmt->execute([
+                $_SESSION['student_id'],
+                $title,
+                $description,
+                $category,
+                $github_link,
+                $project_file,
+                $thumbnail_image
+                ]);
+
+
+                                
                 $success_message = "Project submitted successfully!";
                 
                 // Clear form data after successful submission
                 $_POST = array();
             }
         } catch (PDOException $e) {
-            $error_message = "An error occurred while submitting your project.";
+            $error_message = "An error occurred while submitting your project: " . $e->getMessage();
+            error_log("PDO Error: " . $e->getMessage());  // Log the error to the PHP error log
         }
+        
     }
 }
 
@@ -234,7 +276,15 @@ if ($stmt->execute([$admin_id])) {
                                        accept=".pdf,.doc,.docx,.png,.jpg,.jpeg">
                                 <div class="form-text">Upload your project documentation (max 10MB)</div>
                             </div>
-
+                            <div class="mb-4">
+                                <label for="thumbnail_image" class="form-label">Project Thumbnail Image</label>
+                                <input type="file"
+                                    class="form-control"
+                                    id="thumbnail_image"
+                                    name="thumbnail_image"
+                                    accept=".jpg,.jpeg,.png">
+                                <div class="form-text">Upload a thumbnail image (JPG, PNG, max 5MB)</div>
+                            </div>
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-primary">
                                     <i class="bi bi-cloud-upload me-2"></i>Submit Project
