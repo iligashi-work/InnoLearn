@@ -81,6 +81,7 @@ $average_grade = $graded_projects > 0 ? round($total_grade / $graded_projects, 1
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>.modern-card{padding:20px;}</style>
 </head>
 <body>
     <div class="container mt-5">
