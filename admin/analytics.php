@@ -77,10 +77,18 @@ $monthly_nominations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch all published projects for this admin's students
 $stmt = $pdo->prepare("
-    SELECT p.id, p.title, p.description
+    SELECT p.*, 
+           g.grade,
+           CASE 
+               WHEN g.grade >= 90 THEN 'A'
+               WHEN g.grade >= 80 THEN 'B'
+               WHEN g.grade >= 70 THEN 'C'
+               WHEN g.grade >= 60 THEN 'D'
+               ELSE 'F'
+           END as letter_grade
     FROM projects p
-    JOIN students s ON p.student_id = s.id
-    WHERE s.admin_id = ?
+    LEFT JOIN project_grades g ON p.id = g.project_id
+    WHERE p.student_id = ?
     ORDER BY p.submission_date DESC
 ");
 $stmt->execute([$admin_id]);

@@ -34,14 +34,16 @@ if (!$student) {
 // Get student's projects
 $stmt = $pdo->prepare("
     SELECT p.*, 
+           g.grade,
            CASE 
-               WHEN p.grade >= 90 THEN 'A'
-               WHEN p.grade >= 80 THEN 'B'
-               WHEN p.grade >= 70 THEN 'C'
-               WHEN p.grade >= 60 THEN 'D'
+               WHEN g.grade >= 90 THEN 'A'
+               WHEN g.grade >= 80 THEN 'B'
+               WHEN g.grade >= 70 THEN 'C'
+               WHEN g.grade >= 60 THEN 'D'
                ELSE 'F'
            END as letter_grade
     FROM projects p
+    LEFT JOIN project_grades g ON p.id = g.project_id
     WHERE p.student_id = ?
     ORDER BY p.submission_date DESC
 ");
