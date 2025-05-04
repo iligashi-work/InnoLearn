@@ -22,6 +22,7 @@ $stmt = $pdo->prepare("
            s.first_name, s.last_name, s.department,
            s.student_id as student_number,
            s.admin_id,
+           p.id as project_id,
            p.title as project_title,
            p.category as project_category,
            p.submission_date as project_date
@@ -108,7 +109,7 @@ $other_nominations = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
 
                         <!-- Project Information -->
-                        <?php if ($nomination['project_title']): ?>
+                        <?php if (!empty($nomination['project_id'])): ?>
                             <div class="row mb-4">
                                 <div class="col-12">
                                     <h4 class="mb-3">Related Project</h4>

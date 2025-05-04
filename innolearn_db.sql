@@ -152,7 +152,8 @@ CREATE TABLE `students` (
   `department` varchar(100) NOT NULL,
   `profile_image` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `admin_id` int(11) NOT NULL
+  `admin_id` int(11) NOT NULL,
+  `department_id` INT DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -297,3 +298,13 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 ALTER TABLE projects ADD COLUMN github_link VARCHAR(255) DEFAULT NULL;
+
+
+CREATE TABLE departments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
+INSERT INTO departments (name) VALUES ('Computer Science'), ('Mathematics'), ('Physics');
+
+UPDATE students SET admin_id = 1;

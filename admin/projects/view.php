@@ -63,47 +63,52 @@ if (!$project) {
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="card">
-            <div class="card-header text-center">
-                Project Details
-            </div>
-            <div class="card-body">
-                <table class="table table-striped">
-                    <tr>
-                        <th>Title</th>
-                        <td><?php echo htmlspecialchars($project['title']); ?></td>
-                    </tr>
-                    <tr>
-                        <th>Description</th>
-                        <td><?php echo htmlspecialchars($project['description']); ?></td>
-                    </tr>
-                    <tr>
-                        <th>Category</th>
-                        <td><?php echo htmlspecialchars($project['category']); ?></td>
-                    </tr>
-                    <tr>
-                        <th>Student</th>
-                        <td><?php echo htmlspecialchars($project['first_name'] . ' ' . $project['last_name']); ?></td>
-                    </tr>
-                    <tr>
-                        <th>Department</th>
-                        <td><?php echo htmlspecialchars($project['department']); ?></td>
-                    </tr>
-                    <tr>
-                        <th>Submission Date</th>
-                        <td><?php echo htmlspecialchars($project['submission_date']); ?></td>
-                    </tr>
-                    <?php if (!empty($project['file_path'])): ?>
-                    <tr>
-                        <th>File</th>
-                        <td><a href="../../<?php echo htmlspecialchars($project['file_path']); ?>" class="btn btn-sm btn-success" target="_blank"><i class="bi bi-download"></i> Download</a></td>
-                    </tr>
-                    <?php endif; ?>
-                </table>
-                <div class="text-center mt-4">
-                    <a href="list.php" class="btn btn-primary"><i class="bi bi-arrow-left"></i> Back to Projects</a>
+<body style="background-color: #f4f6fb;">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                <div class="card shadow rounded-4 border-0">
+                    <div class="card-header text-center bg-primary text-white rounded-top-4">
+                        <h2 class="mb-0">Project Details</h2>
+                    </div>
+                    <div class="card-body p-4">
+                        <table class="table table-bordered align-middle mb-4">
+                            <tr>
+                                <th class="bg-light" style="width: 30%;">Title</th>
+                                <td><?php echo htmlspecialchars($project['title']); ?></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Description</th>
+                                <td><?php echo nl2br(htmlspecialchars($project['description'])); ?></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Category</th>
+                                <td><?php echo htmlspecialchars($project['category']); ?></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Student</th>
+                                <td><?php echo htmlspecialchars($project['first_name'] . ' ' . $project['last_name']); ?></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Department</th>
+                                <td><?php echo htmlspecialchars($project['department']); ?></td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Submission Date</th>
+                                <td><?php echo htmlspecialchars($project['submission_date']); ?></td>
+                            </tr>
+                        </table>
+                        <?php if (!empty($project['file_path'])): ?>
+                        <div class="mb-4 text-center">
+                            <a href="../../<?php echo htmlspecialchars($project['file_path']); ?>" class="btn btn-success btn-lg px-4" target="_blank">
+                                <i class="bi bi-download me-1"></i> Download Project File
+                            </a>
+                        </div>
+                        <?php endif; ?>
+                        <div class="text-center mt-3">
+                            <a href="list.php" class="btn btn-primary btn-lg px-4"><i class="bi bi-arrow-left me-1"></i> Back to Projects</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

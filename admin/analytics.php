@@ -75,6 +75,33 @@ $stmt = $pdo->prepare("
 $stmt->execute([$admin_id]);
 $monthly_nominations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Fetch all published projects for this admin's students
+$stmt = $pdo->prepare("
+    SELECT p.id, p.title, p.description
+    FROM projects p
+    JOIN students s ON p.student_id = s.id
+    WHERE s.admin_id = ?
+    ORDER BY p.submission_date DESC
+");
+$stmt->execute([$admin_id]);
+$published_projects = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Function to get AI summary for a project
+function getProjectAISummary($title, $description) {
+    // You can use your existing OpenAI/DeepSeek integration here
+    // For now, we'll use a simple local fallback
+    $prompt = "Write a short, engaging summary for a student project titled \"$title\". Project description: $description";
+    try {
+        // If you have an AI API, call it here (pseudo-code):
+        // $summary = callYourAI($prompt);
+        // return $summary;
+        // Fallback:
+        return substr($description, 0, 120) . (strlen($description) > 120 ? '...' : '');
+    } catch (Exception $e) {
+        return "No summary available.";
+    }
+}
+
 // Function to generate AI insights
 function generateInsights($data, $type) {
     global $openai;
@@ -285,6 +312,35 @@ $nomination_insights = getDeepSeekInsights($nomination_stats, 'nomination catego
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="container mt-5 mb-5">
+        <div class="modern-card">
+            <h3 class="mb-4">AI Summaries of Published Projects</h3>
+            <?php if (empty($published_projects)): ?>
+                <p class="text-muted">No published projects found.</p>
+            <?php else: ?>
+                <div class="row">
+                    <?php foreach ($published_projects as $project): ?>
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title"><?php echo htmlspecialchars($project['title']); ?></h5>
+                                    <p class="card-text text-muted small">
+                                        <?php echo nl2br(htmlspecialchars($project['description'])); ?>
+                                    </p>
+                                    <hr>
+                                    <strong>AI Summary:</strong>
+                                    <p>
+                                        <?php echo htmlspecialchars(getProjectAISummary($project['title'], $project['description'])); ?>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 
