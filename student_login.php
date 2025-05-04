@@ -72,99 +72,100 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body>
-    <!-- Loading Animation -->
     <div class="loading-overlay">
         <div class="spinner-grow text-primary" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
 
-    <nav class="navbar navbar-expand-lg navbar-light">
-        <div class="container">
-            <a class="navbar-brand" href="index.php">InnoLearn</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="public_gallery.php">
-                            <i class="bi bi-grid me-1"></i> Gallery
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="student_login.php">
-                            <i class="bi bi-mortarboard me-1"></i> Student Login
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="admin/login.php">
-                            <i class="bi bi-shield-lock me-1"></i> Admin Login
-                        </a>
-                    </li>
-                </ul>
+    <div class="content-wrapper d-flex flex-column min-vh-100">
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container">
+                <a class="navbar-brand" href="index.php">InnoLearn</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="public_gallery.php">
+                                <i class="bi bi-grid me-1"></i> Gallery
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="student_login.php">
+                                <i class="bi bi-mortarboard me-1"></i> Student Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin/login.php">
+                                <i class="bi bi-shield-lock me-1"></i> Admin Login
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
 
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-4">
-                <div class="modern-card login-card" data-aos="fade-up">
-                    <div class="text-center mb-4">
-                        <i class="bi bi-mortarboard display-1 text-primary"></i>
-                        <h2 class="section-title">Student Login</h2>
+        <div class="container mt-5 flex-grow-1">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-4">
+                    <div class="modern-card login-card" data-aos="fade-up">
+                        <div class="text-center mb-4">
+                            <i class="bi bi-mortarboard display-1 text-primary"></i>
+                            <h2 class="section-title">Student Login</h2>
+                        </div>
+
+                        <?php if ($error_message): ?>
+                            <div class="alert alert-danger" role="alert">
+                                <i class="bi bi-exclamation-circle me-2"></i>
+                                <?php echo htmlspecialchars($error_message); ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <form method="POST" action="" class="needs-validation" novalidate>
+                            <div class="mb-4">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-transparent border-end-0">
+                                        <i class="bi bi-person-badge"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control border-start-0" 
+                                           id="student_id" 
+                                           name="student_id" 
+                                           placeholder="Student ID"
+                                           required>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-transparent border-end-0">
+                                        <i class="bi bi-envelope"></i>
+                                    </span>
+                                    <input type="email" 
+                                           class="form-control border-start-0" 
+                                           id="email" 
+                                           name="email" 
+                                           placeholder="Email Address"
+                                           required>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>
+                                    Login
+                                </button>
+                            </div>
+                        </form>
                     </div>
-
-                    <?php if ($error_message): ?>
-                        <div class="alert alert-danger" role="alert">
-                            <i class="bi bi-exclamation-circle me-2"></i>
-                            <?php echo htmlspecialchars($error_message); ?>
-                        </div>
-                    <?php endif; ?>
-
-                    <form method="POST" action="" class="needs-validation" novalidate>
-                        <div class="mb-4">
-                            <div class="input-group">
-                                <span class="input-group-text bg-transparent border-end-0">
-                                    <i class="bi bi-person-badge"></i>
-                                </span>
-                                <input type="text" 
-                                       class="form-control border-start-0" 
-                                       id="student_id" 
-                                       name="student_id" 
-                                       placeholder="Student ID"
-                                       required>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <div class="input-group">
-                                <span class="input-group-text bg-transparent border-end-0">
-                                    <i class="bi bi-envelope"></i>
-                                </span>
-                                <input type="email" 
-                                       class="form-control border-start-0" 
-                                       id="email" 
-                                       name="email" 
-                                       placeholder="Email Address"
-                                       required>
-                            </div>
-                        </div>
-                        
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-box-arrow-in-right me-2"></i>
-                                Login
-                            </button>
-                        </div>
-                    </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <footer>
+    <footer class="mt-auto">
         <div class="container text-center">
             <p class="text-muted mb-0">
                 <i class="bi bi-stars me-2"></i>
@@ -203,4 +204,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         })()
     </script>
 </body>
-</html> 
+</html>
